@@ -5,29 +5,41 @@ window.onload = function() {
 function initialize() {
     let input = document.querySelector('textarea');
     let transmitter = document.querySelector('#transmitter');
+    let transmitterPreview = transmitter.querySelector('#preview');
+    let transmitterOptical = transmitter.querySelector('#optical');
 
-    document.querySelector('button#preview-transmission').onclick = (e) => {
+    document.querySelector('button#preview').onclick = (e) => {
         let binary = convertToBinary(input.value);
 
-        transmitter.innerText = `Binary:\n\n${binary}\n\n\n\nString:\n\n${convertToString(binary)}`
-    }
-}
-function convertToBinary(input) {
-    // https://stackoverflow.com/a/14430733
-    let output = '';
-
-    for (var i = 0; i < input.length; i++) {
-        output += input[i].charCodeAt(0).toString(2).padStart(7, '0');
+        transmitterOptical.classList.remove('visible');
+        transmitterPreview.innerText = `Binary:\n\n${binary}\n\n\n\nString:\n\n${convertToString(binary)}`;
     }
 
-    return output;
-}
+    document.querySelector('button#transmit').onclick = (e) => {
+        let binary = convertToBinary(input.value);
 
-function convertToString(input) {
-    let output = input
-    .match(/.{1,7}/g)
-    .map(bin => String.fromCharCode(parseInt(bin, 2)))
-    .join('');
+        transmitterOptical.classList.add('visible');
+        transmitterPreview.innerText = '';
 
-    return output;
+        let i = 0;
+        let data = binary.split('');
+        let speed = 100;
+
+        let transmitInterval = setInterval(function() {
+            if (i < data.length) {
+                let code = data[i];
+                if (code === '0') {
+                    transmitterOptical.style.background = 'white';
+                } else {
+                    transmitterOptical.style.background = 'black';
+                }
+                i++;
+            } else {
+                clearInterval(transmitInterval);
+                console.log('Finished transmitting!');
+                transmitterOptical.classList.remove('visible');
+                transmitterPreview.innerText = `FINISHED TRANSMITTING`;
+            }
+        }, speed);
+    }
 }

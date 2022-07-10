@@ -4,6 +4,7 @@ window.onload = function() {
 
 function initialize() {
     let cameraSize;
+    let consoleView = document.querySelector('#console');
 
     if (window.innerWidth < 890) {
         cameraSize = window.innerWidth - 80; 
@@ -13,7 +14,7 @@ function initialize() {
 
     window.params = {
         size: cameraSize,
-        frameRate: 60
+        frameRate: 100
     };
 
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
@@ -70,8 +71,6 @@ function initialize() {
     }
 
     function writeDataToConsoleView(sensorData) {
-        let consoleView = document.querySelector('#console');
-
         consoleView.innerText += sensorData;
     }
 
@@ -105,5 +104,12 @@ function initialize() {
             e.target.innerText = 'Stop Sensor';
             window.readFromSensor = true;
         }
+    }
+
+    document.querySelector('button#convert-to-string').onclick = (e) => {
+        let binary = consoleView.innerText;
+        let string = convertToString(binary);
+
+        consoleView.innerText = string;
     }
 }

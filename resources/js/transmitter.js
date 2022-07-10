@@ -23,23 +23,35 @@ function initialize() {
 
         let i = 0;
         let data = binary.split('');
-        let speed = 100;
 
-        let transmitInterval = setInterval(function() {
+        var frameSpeed = window.config.frameSpeed;
+        var expectedFrameSpeed = Date.now() + frameSpeed;
+
+        setTimeout(sendFrame, frameSpeed, data);
+
+        function sendFrame(data) {
+            // https://stackoverflow.com/a/29972322
+            let drift = Date.now() - expectedFrameSpeed; 
+            if (drift > frameSpeed) {
+                // Clock got out of sync
+            }
+
             if (i < data.length) {
                 let code = data[i];
                 if (code === '0') {
-                    transmitterOptical.style.background = 'white';
+                    transmitterOptical.style.background = 'red';
                 } else {
-                    transmitterOptical.style.background = 'black';
+                    transmitterOptical.style.background = 'blue';
                 }
                 i++;
+
+                expectedFrameSpeed += frameSpeed;
+                setTimeout(sendFrame, Math.max(0, frameSpeed - drift), data);
             } else {
-                clearInterval(transmitInterval);
                 console.log('Finished transmitting!');
                 transmitterOptical.classList.remove('visible');
                 transmitterPreview.innerText = `FINISHED TRANSMITTING`;
             }
-        }, speed);
+        }
     }
 }
